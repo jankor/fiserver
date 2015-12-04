@@ -1,0 +1,11 @@
+var cfg = {
+  bars: 1000
+  oandaAdapter: {
+    environment: 'practice',
+    accessToken: '',
+    username: '',
+    accountId: ''
+  }
+};
+
+module.exports = cfg;

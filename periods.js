@@ -1,3 +1,3 @@
-var symbols = ['M1'];
+var symbols = ['M1', 'M5'];
 
 module.exports = symbols;

@@ -9,7 +9,10 @@ var symbolsObject = symbols.reduce(function(o, v, i) {
 
 var timeseries = {
   intervals: {
-      M1: 60000
+      M1: 60000,
+      M5: 60000 * 5,
+      M15: 60000 * 15,
+      M30: 60000 * 30
   },
 
   db: {

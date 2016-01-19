@@ -3,6 +3,9 @@ var cfg = require("./config");
 var timeseries = require("./timeseries");
 var symbols = require("./symbols");
 var periods = require("./periods");
+var server = require('http').createServer();
+var io = require('socket.io')(server);
+
 var client = new OANDAAdapter({
     // 'live', 'practice' or 'sandbox'
     environment: cfg.oandaAdapter.environment,
@@ -11,16 +14,18 @@ var client = new OANDAAdapter({
     // Optional. Required only if evironment is 'sandbox'
     username: cfg.oandaAdapter.username
 });
-var accountId = cfg.oandaAdapter.environment.accountId;
+var accountId = cfg.oandaAdapter.accountId;
 
 symbols.forEach(function(symbol){
+  try {
     client.subscribePrice(accountId, symbol, function (tick) {
+      console.log(tick);
         timeseries.update(tick);
-        console.log(timeseries.db.M1.EUR_USD.length);
-        if (timeseries.db.M1.EUR_USD.length > 0) {
-          console.log(timeseries.db.M1.EUR_USD[0]);
-        }
+        bodyChunk = tick;
     }, this);
+  } catch (e) {
+    console.log(e);
+  }
 })
 
 periods.forEach(function(period){
@@ -30,3 +35,16 @@ periods.forEach(function(period){
         });
     })
 })
+
+io.on('connection', function(socket){
+  socket.emit('initInstruments', 'Some json');
+  socket.on('disconnect', function(){});
+  setInterval(function(){
+    if (bodyChunk !== last) {
+      socket.emit('update', bodyChunk);
+      last = bodyChunk;
+    }
+  }, 0.001);
+});
+
+server.listen(3000);
